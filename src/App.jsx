@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import Rotina from './components/Rotina'
+import Navegacao from './components/Navegacao'
 
 function App() {
+
+  const [telaAtiva, setTelaAtiva] = useState('hoje')
+
   const [agua, setAgua] = useState(() => {
     const aguaSalva = localStorage.getItem('agua')
     return aguaSalva ? Number(aguaSalva) : 0
@@ -188,7 +192,13 @@ function App() {
         <span>Acompanhe sua evolução diária em um só lugar.</span>
       </header>
 
-      <section className="resumo">
+      <section
+        className={
+          telaAtiva === 'hoje'
+            ? 'resumo'
+            : 'resumo tela-oculta'
+        }
+      >
         <article className="cartao">
           <h2>Água</h2>
           <strong>{agua} / 3 litros</strong>
@@ -259,70 +269,7 @@ function App() {
         </article>
 
 
-        <article className="cartao">
-          <h2>Finanças</h2>
-
-          <strong>
-            {totalGastos.toLocaleString('pt-BR', {
-              style: 'currency',
-              currency: 'BRL',
-            })}
-          </strong>
-
-          <p>Gastos registrados</p>
-
-          <form className="formulario-gasto" onSubmit={adicionarGasto}>
-            <input
-              type="text"
-              placeholder="Descrição do gasto"
-              value={descricaoGasto}
-              onChange={(evento) => setDescricaoGasto(evento.target.value)}
-            />
-
-            <input
-              type="text"
-              inputMode="decimal"
-              placeholder="Valor do gasto"
-              value={valorGasto}
-              onChange={(evento) => setValorGasto(evento.target.value)}
-            />
-
-            <button type="submit" className="botao-gasto">
-              Adicionar gasto
-            </button>
-          </form>
-
-          {gastos.length > 0 && (
-            <ul className="lista-gastos">
-              {gastos.map((gasto) => (
-                <li key={gasto.id}>
-                  <div>
-                    <span>{gasto.descricao}</span>
-                    <strong>
-                      {gasto.valor.toLocaleString('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL',
-                      })}
-                    </strong>
-                  </div>
-
-                  <button
-                    className="remover-gasto"
-                    onClick={() => removerGasto(gasto.id)}
-                  >
-                    Excluir
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {gastos.length > 0 && (
-            <button className="botao-reset" onClick={zerarGastos}>
-              Limpar todos os gastos
-            </button>
-          )}
-        </article>
+        
       </section>
 
       <article className="cartao cartao-dieta">
@@ -356,10 +303,16 @@ function App() {
           </div>
         </article>
 
-        <Rotina />
+        {telaAtiva === 'rotina' && <Rotina />}
 
         
-      <section className="historico">
+      <section
+        className={
+          telaAtiva === 'evolucao'
+          ? 'historico'
+          : 'historico tela-oculta'
+        }
+      >
   <div className="titulo-historico">
     <div>
       <p>Evolução</p>
@@ -412,9 +365,163 @@ function App() {
   )}
 </section>
 
-<section className='historico'>
-  {/* conteúdo do histórico*/}
+{telaAtiva === 'financas' && (
+  <section className="tela-financas">
+    <div>
+      <p>Controle financeiro</p>
+      <h2>Finanças</h2>
+    </div>
+
+    <article className="cartao">
+      <strong>
+        {totalGastos.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        })}
+      </strong>
+
+      <p>Gastos registrados</p>
+
+      <form
+        className="formulario-gastos"
+        onSubmit={adicionarGasto}
+      >
+        <input
+          type="text"
+          placeholder="Descrição de gastos"
+          value={descricaoGasto}
+          onChange={(evento) =>
+            setDescricaoGasto(evento.target.value)
+          }
+        />
+
+        <input
+          type="text"
+          inputMode="decimal"
+          placeholder="Valor de gasto"
+          value={valorGasto}
+          onChange={(evento) =>
+            setValorGasto(evento.target.value)
+          }
+        />
+
+        <button type="submit" calssName="botao-gasto">
+          Adicionar gasto
+        </button>
+      </form>
+
+      {gastos.length > 0 && (
+        <ul className="lista-gastos">
+          {gastos.map((gastos) => (
+            <li key={gasto.id}>
+              <div>
+                <span>{gastos.descricao}</span>
+
+                <strong>
+                  {gasto.valor.toLocaleString('pt-BR',{
+                    style: 'currency',
+                    currency: 'BRL',
+                  })}
+                </strong>
+              </div>
+
+              <button
+                type="button"
+                className="remove-gastos"
+                onClick={() => removerGasto(gasto.id)}
+              >
+                Excluir
+              </button>
+            </li>
+          ))}
+        </ul>
+
+      )}
+
+           {gastos.length > 0 && (
+        <button
+          type="button"
+          className="botao-reset"
+          onClick={zerarGastos}
+        >
+          Limpar todos os gastos
+        </button>
+      )}
+    </article>
+  </section>
+)}
+    
+
+<section 
+  className={
+    telaAtiva === 'evolucao'
+    ? 'historico'
+    : 'historico tela-oculta'
+
+  }
+>
+  <div className="titulo-historico">
+    <div>
+      <p>Evolução</p>
+      <h2>Histórico diário</h2>
+    </div>
+
+    <span>
+      {historicoDiario.length === 0 ? (
+        <div className="historico-vazio">
+          <p>
+            O Histórico aparecerá aqui após o primeiro dia completo.
+          </p>
+        </div>
+      ): (
+        <div className="lista-historico">
+          {[...historicoDiario]
+          .reverse()
+          .map((registro) => (
+            <articles
+              classname="registro-dia"
+              key={registro.id}
+            >
+              <h3>{registro.data}</h3>
+
+              <div className="dados-dia">
+                <p>
+                  Estudos 
+                  <strong>
+                    {registro.minutosEstudo} min
+                  </strong>
+                </p>
+
+                <p>
+                  Treino 
+                  <strong>
+                    {registro.treinoConcluido
+                      ? 'Concuído'
+                      :'Não realizado'}
+                  </strong>
+                </p>
+
+                <p>
+                  Dieta 
+                  <strong>
+                    {registro.refeicaoJaConcluidas?.length || 0}
+                    {' '} / 4 refeições
+                  </strong>
+                </p>
+              </div>
+            </articles>
+          ))}
+        </div>
+      )}
+    </span>
+  </div>
+ 
 </section>
+
+<Navegacao
+  telaAtiva={telaAtiva}
+  aoMudarTela={setTelaAtiva}
+/>
     </main>
   )
 }
