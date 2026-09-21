@@ -1,5 +1,6 @@
 import { useState} from 'react'
 import { supabase} from '../lib/supabaseClient'
+import './Login.css'
 
 function Login() {
     const [email, setEmail] = useState('')
@@ -8,23 +9,25 @@ function Login() {
     const [carregando, setCarregando] = useState(false)
 
     async function entrar(evento) {
-        evento.preventDefaut()
-        setCarregando(true)
-        setMensagem('')
+    evento.preventDefault()
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password: senha,
-        })
+    setCarregando(true)
+    setMensagem('')
 
-        if (error) {
-            setMensagem('Erro: ${error.message}')
-        } else {
-            setMensagem('Login realizado com sucesso!')
-        }
+    const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: senha,
+    })
 
+    if (error) {
+        setMensagem(`Erro: ${error.message}`)
         setCarregando(false)
+        return
     }
+
+    setMensagem('Login realizado com sucesso!')
+    setCarregando(false)
+    }   
 
     async function cadastrar() {
         setCarregando(true)
@@ -47,14 +50,19 @@ function Login() {
     return (
         <main className="login-container">
             <form className="login-card" onSubmit={entrar}>
-                <h1>Central Pessoal</h1>
+                <h1>Central
+                    <br />
+                    Pessoal
+                </h1>
                 <p>Entre para acessar seus dados</p>
 
                 <input
                     type="email"
+                    name="email"
                     placeholder="Seu e-mail"
                     value={email}
-                    onChange={(evento) => setSenha(evento.target.value)} 
+                    onChange={(evento) => setEmail(evento.target.value)}
+                    autoComplete="email"
                     required
                 />
 
@@ -69,7 +77,7 @@ function Login() {
                 />
 
 
-                <button type="submit" disabled={cadastrar}>
+                <button type="submit" disabled={carregando}>
                     {carregando ? 'Aguarde...' : 'Entrar'}
                 </button>
 

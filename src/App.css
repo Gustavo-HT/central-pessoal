@@ -856,3 +856,21 @@ body {
   padding: 10px;
 }
 
+.botao-sair {
+  margin-top: 14px;
+  padding: 8px 18px;
+  border: 1px solid #d5d9dd;
+  border-radius: 8px;
+  background: transparent;
+  color: #555555;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.botao-sair:hover {
+  border-color:#e53935;
+  background: #fff1f1;
+  color: #e53935;
+}

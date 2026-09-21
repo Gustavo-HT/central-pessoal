@@ -2,8 +2,14 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import Rotina from './components/Rotina'
 import Navegacao from './components/Navegacao'
+import Login from './components/Login'
+import { supabase } from './lib/supabaseClient'
+
 
 function App() {
+
+  const [sessao, setSessao] = useState(null)
+  const [verificandoSessao, setVerificandoSessao] = useState(true)
 
   const [telaAtiva, setTelaAtiva] = useState('hoje')
 
@@ -51,6 +57,22 @@ function App() {
   const historicoDiario = JSON.parse(
     localStorage.getItem('historicoDiario') || '[]'
   )
+
+  useEffect(() =>{
+    supabase.auth.getSession().then(({ data}) => {
+      setSessao(data.session)
+      setVerificandoSessao(false)
+    })
+
+    const { data } = supabase.auth.onAuthStateChange((_evento, novaSessao) => {
+      setSessao(novaSessao)
+      setVerificandoSessao(false)
+    })
+
+    return () => {
+      data.subscription.unsubscribe()
+    }
+  }, [])
 
   useEffect(() => {
     localStorage.setItem('agua', agua)
@@ -184,12 +206,40 @@ function App() {
     setGastos([])
   }
 
+  async function sair() {
+    const {error} = await supabase.auth.signOut()
+
+    if (error) {
+      alert('Erro ao sair: ${error.message}')
+      return
+    }
+
+    setSessao(null)
+    
+  }
+
+  if (verificandoSessao) {
+    return <p>Carregando...</p>
+  }
+
+  if (!sessao) {
+    return <Login />
+  }
+
   return (
     <main className="painel">
       <header className="cabecalho">
         <p>Central Pessoal</p>
         <h1>Olá, Gustavo!</h1>
         <span>Acompanhe sua evolução diária em um só lugar.</span>
+
+        <button
+          type="button"
+          className="botao-sair"
+          onClick={sair}
+        >
+          Sair
+        </button>
       </header>
 
       <section
