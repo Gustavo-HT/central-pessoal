@@ -230,7 +230,11 @@ function App() {
     <main className="painel">
       <header className="cabecalho">
         <p>Central Pessoal</p>
-        <h1>Olá, Gustavo!</h1>
+        <h1>
+          Olá, {sessao.user.user_metadata?.nome
+            || sessao.user.email?.split('@')[0]
+            || 'Usuário'}!
+        </h1>
         <span>Acompanhe sua evolução diária em um só lugar.</span>
 
         <button
@@ -455,20 +459,21 @@ function App() {
           }
         />
 
-        <button type="submit" calssName="botao-gasto">
-          Adicionar gasto
+        <button type="submit" className="botao-gasto">
+            Adicionar gasto
         </button>
       </form>
 
       {gastos.length > 0 && (
         <ul className="lista-gastos">
-          {gastos.map((gastos) => (
+          {gastos.map((gasto) => (
             <li key={gasto.id}>
-              <div>
-                <span>{gastos.descricao}</span>
+              <div className="gasto-info">
+                <span>{gasto.descricao}</span>
+                <span>=</span>
 
                 <strong>
-                  {gasto.valor.toLocaleString('pt-BR',{
+                  {gasto.valor.toLocaleString('pt-BR', {
                     style: 'currency',
                     currency: 'BRL',
                   })}

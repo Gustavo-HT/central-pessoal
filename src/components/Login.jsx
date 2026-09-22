@@ -3,6 +3,7 @@ import { supabase} from '../lib/supabaseClient'
 import './Login.css'
 
 function Login() {
+    const [nome, setNome] = useState('')
     const [email, setEmail] = useState('')
     const [senha, setSenha] = useState('')
     const [mensagem, setMensagem] = useState('')
@@ -19,11 +20,19 @@ function Login() {
         password: senha,
     })
 
-    if (error) {
-        setMensagem(`Erro: ${error.message}`)
+    if (nome.trim()) {
+    const { error: erroNome } = await supabase.auth.updateUser({
+        data: {
+        nome: nome.trim(),
+        },
+    })
+
+    if (erroNome) {
+        setMensagem(`Erro ao salvar nome: ${erroNome.message}`)
         setCarregando(false)
         return
     }
+}
 
     setMensagem('Login realizado com sucesso!')
     setCarregando(false)
@@ -55,6 +64,15 @@ function Login() {
                     Pessoal
                 </h1>
                 <p>Entre para acessar seus dados</p>
+
+                <input
+                     type="text"
+                    name="nome"
+                    placeholder="Como deseja ser chamado?"
+                    value={nome}
+                    onChange={(evento) => setNome(evento.target.value)}
+                    autoComplete="name"
+                />
 
                 <input
                     type="email"
